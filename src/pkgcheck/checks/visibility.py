@@ -436,7 +436,10 @@ class RdependCycleCheck(RepoCheck, OptionalCheck):
         self.visited_packages[key] = all_deps = frozenset().union(*pkg_deps.values())
         if missing := all_deps - self.visited_packages.keys():
             for missing_key in missing:
-                self._collect_deps_graph(self.repo.match(atom(missing_key)))
+                try:
+                    self._collect_deps_graph(self.repo.match(atom(missing_key)))
+                except IndexError:
+                    self.visited_packages[missing_key] = frozenset()
         return pkg_deps
 
     def feed(self, pkgset):
